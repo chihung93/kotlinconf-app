@@ -1,6 +1,5 @@
 package org.jetbrains.kotlinconf.ui
 
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.os.Bundle
@@ -43,21 +42,6 @@ class SpeakersController : Fragment() {
         }
     }
 
-    class SpeakerViewDecoration(private val spacing: Int = 8) : RecyclerView.ItemDecoration() {
-        override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
-        ) {
-            super.getItemOffsets(outRect, view, parent, state)
-            outRect.bottom = spacing.dp
-            outRect.top = spacing.dp
-        }
-    }
-
-    class SpeakerViewHolder(val speakerView: View) : RecyclerView.ViewHolder(speakerView)
-
     inner class SpeakersAdapter(
         var speakers: List<SpeakerData> = emptyList()
     ) : RecyclerView.Adapter<SpeakerViewHolder>() {
@@ -71,39 +55,50 @@ class SpeakersController : Fragment() {
 
         override fun onBindViewHolder(holder: SpeakerViewHolder, position: Int) {
             val speaker = speakers[position]
-            val picture = speaker.profilePicture
-
-            holder.speakerView.apply {
-                setOnClickListener {
-                    setBackgroundColor(color(R.color.whiteSelected))
-                    showSpeaker(speaker.id)
-                    setBackgroundColor(color(R.color.white))
-                }
-
-                val photo = findViewById<ImageView>(R.id.speaker_photo)
-                val name = findViewById<TextView>(R.id.speaker_name)
-                val description = findViewById<TextView>(R.id.speaker_description)
-
-                name.text = speaker.fullName.toUpperCase()
-                description.text = speaker.tagLine
-
-                if (picture == null) {
-                    photo.setImageBitmap(null)
-                    return
-                }
-
-                ConferenceService.findPicture(picture) {
-                    photo.setImageBitmap(BitmapFactory.decodeByteArray(it, 0, it.size))
-                }
-            }
-        }
-
-        private fun showSpeaker(id: String) {
-            val intent = Intent(context, SpeakerActivity::class.java).apply {
-                putExtra("speaker", id)
-            }
-            startActivity(intent)
+            holder.update(speaker)
         }
     }
+}
 
+class SpeakerViewHolder(private val speakerView: View) : RecyclerView.ViewHolder(speakerView) {
+    fun update(speaker: SpeakerData) {
+        val picture = speaker.profilePicture
+
+        speakerView.apply {
+            setOnClickListener {
+                setBackgroundColor(color(R.color.selected_white))
+                speakerView.showActivity<SpeakerActivity>()
+                setBackgroundColor(color(R.color.white))
+            }
+
+            val photo = findViewById<ImageView>(R.id.speaker_photo)
+            val name = findViewById<TextView>(R.id.speaker_name)
+            val description = findViewById<TextView>(R.id.speaker_description)
+
+            name.text = speaker.fullName.toUpperCase()
+            description.text = speaker.tagLine
+
+            if (picture == null) {
+                photo.setImageBitmap(null)
+                return
+            }
+
+            ConferenceService.findPicture(picture) {
+                photo.setImageBitmap(BitmapFactory.decodeByteArray(it, 0, it.size))
+            }
+        }
+    }
+}
+
+class SpeakerViewDecoration(private val spacing: Int = 8) : RecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        super.getItemOffsets(outRect, view, parent, state)
+        outRect.bottom = spacing.dp
+        outRect.top = spacing.dp
+    }
 }

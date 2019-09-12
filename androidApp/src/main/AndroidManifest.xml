@@ -22,6 +22,7 @@
         </activity>
 
         <activity android:name="org.jetbrains.kotlinconf.ui.SpeakerActivity" />
+        <activity android:name="org.jetbrains.kotlinconf.ui.SessionActivity" />
     </application>
 
 </manifest>

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#FFFFFF</color>
-    <color name="blueSky">#1874e5</color>
-    <color name="whiteSelected">#d8d8d8</color>
+    <color name="sky_blue">#167dff</color>
+    <color name="selected_white">#d8d8d8</color>
     <color name="dark_grey_70">#b327282c</color>
     <color name="dark_grey">#27282c</color>
     <color name="red_orange">#ff3f00</color>
     <color name="slate_grey">#67686b</color>
     <color name="dark_grey_40">#6627282c</color>
+    <color name="dark_grey_5">#0c27282c</color>
 </resources>
 
