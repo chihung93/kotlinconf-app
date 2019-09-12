@@ -8,6 +8,7 @@
     <color name="red_orange">#ff3f00</color>
     <color name="slate_grey">#67686b</color>
     <color name="dark_grey_40">#6627282c</color>
+    <color name="dark_grey_20">#f4f4f4</color>
     <color name="dark_grey_5">#0c27282c</color>
 </resources>
 

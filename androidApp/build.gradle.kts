@@ -63,6 +63,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
     implementation("io.ktor:ktor-client-android:$ktor_version")
 
+    implementation("com.mapbox.mapboxsdk:mapbox-android-sdk:8.3.0")
+
     testImplementation("junit:junit:4.12")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
