@@ -1,14 +1,13 @@
 package org.jetbrains.kotlinconf
 
-import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.HttpClient
+import io.ktor.client.features.HttpResponseValidator
+import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.*
-import io.ktor.client.response.*
+import io.ktor.client.response.HttpResponse
 import io.ktor.http.*
-import kotlinx.io.core.*
-import kotlin.native.concurrent.*
+import io.ktor.utils.io.core.use
+import kotlin.native.concurrent.ThreadLocal
 
 /**
  * Adapter to handle backend API and manage auth information.
@@ -17,16 +16,11 @@ import kotlin.native.concurrent.*
 internal object Api {
     //    val endpoint = "https://konf-staging.kotlin-aws.intellij.net/"
 //    val endpoint = "http://172.30.160.213:8080"
-    val endpoint = "http://10.0.2.2:8080"
-//    val endpoint = "http://0.0.0.0:8080"
+//    val endpoint = "http://10.0.2.2:8080"
+    val endpoint = "http://0.0.0.0:8080"
 
     private val client = HttpClient {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer().apply {
-                setMapper(ConferenceData::class, ConferenceData.serializer())
-                setMapper(VoteData::class, VoteData.serializer())
-            }
-        }
+        install(JsonFeature)
 
         HttpResponseValidator {
             validateResponse {

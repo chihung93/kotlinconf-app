@@ -33,11 +33,7 @@ fun Application.launchSyncJob(sessionizeUrl: String, sessionizeInterval: Long) {
 }
 
 private val client = HttpClient {
-    install(JsonFeature) {
-        serializer = KotlinxSerializer().apply {
-            setMapper(ConferenceData::class, ConferenceData.serializer())
-        }
-    }
+    install(JsonFeature)
 }
 
 suspend fun synchronizeWithSessionize(sessionizeUrl: String) {

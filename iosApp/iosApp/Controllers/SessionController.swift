@@ -22,9 +22,9 @@ class SessionController : UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var voteOk: UIButton!
     @IBOutlet weak var voteDown: UIButton!
 
-    private var ratingObserver: Kotlinx_ioCloseable? = nil
-    private var favoriteObserver: Kotlinx_ioCloseable? = nil
-    private var liveObserver: Kotlinx_ioCloseable? = nil
+    private var ratingObserver: Ktor_ioCloseable? = nil
+    private var favoriteObserver: Ktor_ioCloseable? = nil
+    private var liveObserver: Ktor_ioCloseable? = nil
 
     var card: SessionCard!
     private var borders: [CALayer]!

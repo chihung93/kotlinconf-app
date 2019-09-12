@@ -1,8 +1,8 @@
 package org.jetbrains.kotlinconf
 
+import io.ktor.utils.io.core.Closeable
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.io.core.*
 
 fun <T> Flow<T>.wrap(): CFlow<T> = CFlow(this)
 

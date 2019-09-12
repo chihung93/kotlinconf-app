@@ -10,7 +10,7 @@ class LiveVideo : UICollectionViewCell {
     @IBOutlet weak var location: UILabel!
     @IBOutlet weak var favoriteButton: UIButton!
 
-    var favoriteObservable: Kotlinx_ioCloseable? = nil
+    var favoriteObservable: Ktor_ioCloseable? = nil
 
     var card: SessionCard! {
         didSet {

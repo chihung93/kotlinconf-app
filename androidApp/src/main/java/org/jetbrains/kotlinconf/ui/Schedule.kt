@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
-import kotlinx.io.core.Closeable
+import io.ktor.utils.io.core.Closeable
 import org.jetbrains.kotlinconf.ConferenceService
 import org.jetbrains.kotlinconf.R
 import org.jetbrains.kotlinconf.color

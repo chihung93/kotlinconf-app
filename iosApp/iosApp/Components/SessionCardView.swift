@@ -28,9 +28,9 @@ class SessionCardView : UIView, Baloon {
     
     var baloonContainer: BaloonContainer? = nil
 
-    private var liveObservable: Kotlinx_ioCloseable? = nil
-    private var ratingObservable: Kotlinx_ioCloseable? = nil
-    private var favoriteObservable: Kotlinx_ioCloseable? = nil
+    private var liveObservable: Ktor_ioCloseable? = nil
+    private var ratingObservable: Ktor_ioCloseable? = nil
+    private var favoriteObservable: Ktor_ioCloseable? = nil
 
     var onTouch: () -> Void = {}
 

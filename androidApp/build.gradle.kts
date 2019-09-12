@@ -6,6 +6,16 @@ val coroutines_version: String by project
 val ktor_version: String by project
 val sticky_headers: String by project
 val glide_version: String by project
+val androidx_base: String by project
+val androidx_ui: String by project
+val androidx_navigation: String by project
+val android_multidex: String by project
+val android_material: String by project
+val android_constraint_layout: String by project
+val android_mapbox: String by project
+val junit_version: String by project
+val androidx_test: String by project
+val androidx_espresso: String by project
 
 plugins {
     id("com.android.application")
@@ -16,7 +26,7 @@ plugins {
 
 android {
     compileSdkVersion(28)
-    buildToolsVersion = "29.0.1"
+    buildToolsVersion = "29.0.2"
     defaultConfig {
         applicationId = "com.jetbrains.kotlinconf"
         minSdkVersion(16)
@@ -47,28 +57,29 @@ android {
 dependencies {
     implementation(project(":common"))
 
-    implementation("androidx.appcompat:appcompat:1.1.0")
-    implementation("androidx.core:core-ktx:1.1.0")
-    implementation("com.google.android.material:material:1.0.0")
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-    implementation("androidx.vectordrawable:vectordrawable:1.1.0")
-    implementation("androidx.navigation:navigation-fragment:2.1.0")
-    implementation("androidx.navigation:navigation-ui:2.1.0")
-    implementation("androidx.lifecycle:lifecycle-extensions:2.1.0")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.1.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.1.0")
+    implementation("androidx.appcompat:appcompat:$$androidx_base")
+    implementation("androidx.core:core-ktx:$androidx_base")
+    implementation("androidx.vectordrawable:vectordrawable:$androidx_base")
 
-    implementation("com.android.support:multidex:1.0.3")
+    implementation("androidx.navigation:navigation-fragment:$androidx_ui")
+    implementation("androidx.navigation:navigation-ui:$androidx_ui")
+    implementation("androidx.lifecycle:lifecycle-extensions:$androidx_ui")
+    implementation("androidx.navigation:navigation-fragment-ktx:$androidx_ui")
+    implementation("androidx.navigation:navigation-ui-ktx:$androidx_ui")
+
+    implementation("com.google.android.material:material:$android_material")
+    implementation("androidx.constraintlayout:constraintlayout:$android_constraint_layout")
+
+    implementation("com.android.support:multidex:$android_multidex")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
     implementation("io.ktor:ktor-client-android:$ktor_version")
 
-    implementation("com.mapbox.mapboxsdk:mapbox-android-sdk:8.3.0")
+    implementation("com.mapbox.mapboxsdk:mapbox-android-sdk:$android_mapbox")
 
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:$junit_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
 
-    androidTestImplementation("androidx.test:runner:1.2.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
+    androidTestImplementation("androidx.test:runner:$androidx_test")
 }
