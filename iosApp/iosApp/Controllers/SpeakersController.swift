@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import KotlinConfAPI
+import Nuke
 
 class SpeakersController : UIViewController, UITableViewDataSource, UITableViewDelegate, UIGestureRecognizerDelegate {
     @IBOutlet weak var speakersList: UITableView!
@@ -13,9 +14,9 @@ class SpeakersController : UIViewController, UITableViewDataSource, UITableViewD
         speakersList.dataSource = self
         speakersList.delegate = self
 
-        Conference.speakers.watch(block: { speakers in
+        Conference.speakers.watch { speakers in
             return self.onSpeakers(speakers: speakers as! [SpeakerData])
-        })
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -74,10 +75,7 @@ class SpeakerCellView : UITableViewCell {
             speakerPosition.text = speaker.tagLine
 
             if let profilePicture = speaker.profilePicture {
-                speakerPhoto.image = nil
-                Conference.findPicture(url: profilePicture, block: { (bytes) in
-                    self.speakerPhoto.image = UIImage(data: bytes.toNSData())
-                })
+                Nuke.loadImage(with: URL(string: profilePicture)!, into: speakerPhoto)
             }
         }
     }

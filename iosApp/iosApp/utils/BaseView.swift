@@ -3,19 +3,17 @@ import UIKit
 import KotlinConfAPI
 
 extension UIViewController: BaseView {
-    
     public func showError(error: KotlinThrowable) {
-        print("ERROR")
-        print("-----------------------------")
-        error.printStackTrace()
-        print("-----------------------------")
-
         var title: String = "Error"
         var errorMessage: String!
 
         switch error {
         case is Unauthorized:
-            errorMessage = "Unauthorized"
+            navigationController?.pushViewController(
+                createPage(name: "WelcomePrivacyPolicyController"),
+                animated: true
+            )
+            return
         case is CannotFavorite:
             errorMessage = "Cannot set favorite now"
         case is CannotPostVote:
@@ -40,15 +38,28 @@ extension UIViewController: BaseView {
     }
 
     func showError(title: String, message: String) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
-        alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertAction.Style.default,handler: nil))
+        let alertController = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: UIAlertController.Style.alert
+        )
+        alertController.addAction(UIAlertAction(
+            title: "Dismiss",
+            style: UIAlertAction.Style.default,
+            handler: nil
+        ))
+
         self.present(alertController, animated: true, completion: nil)
     }
 }
 
 extension UIView {
     func roundCorners(corners: UIRectCorner, radius: CGFloat) {
-        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        let path = UIBezierPath(
+            roundedRect: bounds,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
         let mask = CAShapeLayer()
         mask.path = path.cgPath
         layer.mask = mask

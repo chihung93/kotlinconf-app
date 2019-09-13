@@ -1,11 +1,13 @@
 package org.jetbrains.kotlinconf.ui
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.mapbox.mapboxsdk.Mapbox
+import android.content.res.*
+import android.os.*
+import androidx.appcompat.app.*
+import androidx.navigation.*
+import androidx.navigation.ui.*
+import com.mapbox.mapboxsdk.*
+import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.kotlinconf.*
 import org.jetbrains.kotlinconf.R
 
 class MainActivity : AppCompatActivity() {
@@ -18,13 +20,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigationBar() {
-        val view: BottomNavigationView = findViewById(R.id.nav_view)
         val controller = findNavController(R.id.nav_host_fragment)
-        view.setupWithNavController(controller)
+        bottom_navigation.setupWithNavController(controller)
 
         Mapbox.getInstance(
-            this,
-            "pk.eyJ1IjoiZGVuaXN2b3Jvbm92MSIsImEiOiJjanl0emhmdWYwOHRkM21wcjhka3BoNmJjIn0.Rt6kMPmQXvQznBNDdHU_VQ"
+            this, MAPBOX_ACCESS_TOKEN
         )
     }
 }

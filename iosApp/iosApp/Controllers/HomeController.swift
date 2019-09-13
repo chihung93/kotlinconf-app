@@ -15,13 +15,13 @@ class HomeController : UIViewController, UICollectionViewDataSource, UIGestureRe
         videosView.dataSource = self
         videosView.delegate = self
 
-        Conference.liveSessions.watch(block: { cards in
+        Conference.liveSessions.watch { cards in
             self.onLiveSessions(sessions: cards as! [SessionCard])
-        })
+        }
 
-        Conference.upcomingFavorites.watch(block: { cards in
+        Conference.upcomingFavorites.watch { cards in
             self.onUpcomingFavorites(sessions: cards as! [SessionCard])
-        })
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -44,7 +44,7 @@ class HomeController : UIViewController, UICollectionViewDataSource, UIGestureRe
             card.cleanup()
         }
 
-        upcoming = sessions.map({card in
+        upcoming = sessions.map { card in
             let view = SessionCardView()
             view.card = card
             view.setupDarkMode()
@@ -58,7 +58,7 @@ class HomeController : UIViewController, UICollectionViewDataSource, UIGestureRe
             upcomingFavorites.addArrangedSubview(view)
             upcomingFavorites.setCustomSpacing(5.0, after: view)
             return view
-        })
+        }
     }
 
     @IBAction func showParners(_ sender: Any) {
@@ -83,10 +83,15 @@ class HomeController : UIViewController, UICollectionViewDataSource, UIGestureRe
         }
     }
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
         switch collectionView {
         default:
-            let item = collectionView.dequeueReusableCell(withReuseIdentifier: "LiveVideo", for: indexPath) as! LiveVideo
+            let item = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "LiveVideo", for: indexPath
+            ) as! LiveVideo
             item.card = liveSessions[indexPath.row]
             return item
         }
@@ -96,9 +101,9 @@ class HomeController : UIViewController, UICollectionViewDataSource, UIGestureRe
         switch collectionView {
         case videosView:
             let card = liveSessions[indexPath.row]
-            showScreen(name: "Session", config: { controller in
+            showScreen(name: "Session") { controller in
                 (controller as! SessionController).card = card
-            })
+            }
         default:
             return
         }
@@ -106,7 +111,11 @@ class HomeController : UIViewController, UICollectionViewDataSource, UIGestureRe
 }
 
 extension HomeController : UIScrollViewDelegate, UICollectionViewDelegate {
-    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    func scrollViewWillEndDragging(
+        _ scrollView: UIScrollView,
+        withVelocity velocity: CGPoint,
+        targetContentOffset: UnsafeMutablePointer<CGPoint>
+    ) {
         let view: UICollectionView = {
             switch scrollView {
 //            case self.videosView:

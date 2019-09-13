@@ -1,9 +1,6 @@
 package org.jetbrains.kotlinconf.backend
 
 import io.ktor.application.*
-import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
@@ -13,6 +10,7 @@ import java.util.concurrent.*
 
 @Volatile
 private var sessionizeData: SessionizeData? = null
+
 val comeBackLater = HttpStatusCode(477, "Come Back Later")
 val tooLate = HttpStatusCode(478, "Too Late")
 val keynoteTimeZone = ZoneId.of("Europe/Paris")!!
@@ -34,16 +32,8 @@ fun Application.launchSyncJob(sessionizeUrl: String, sessionizeInterval: Long) {
     }
 }
 
-private val client = HttpClient {
-    install(JsonFeature)
-}
-
 suspend fun synchronizeWithSessionize(sessionizeUrl: String) {
-    try {
-        sessionizeData = client.get<SessionizeData>(sessionizeUrl)
-    } catch (cause: Throwable) {
-        throw cause
-    }
+    sessionizeData = client.get<SessionizeData>(sessionizeUrl)
 }
 
 fun getSessionizeData(): SessionizeData = sessionizeData ?: throw ServiceUnavailable()

@@ -1,21 +1,26 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+import org.jetbrains.kotlin.gradle.dsl.*
+import java.util.*
 
 val kotlin_version: String by project
-val anko_version: String by project
 val coroutines_version: String by project
 val ktor_version: String by project
-val sticky_headers: String by project
 val glide_version: String by project
 val androidx_base: String by project
 val androidx_ui: String by project
-val androidx_navigation: String by project
 val android_multidex: String by project
 val android_material: String by project
 val android_constraint_layout: String by project
 val android_mapbox: String by project
 val junit_version: String by project
 val androidx_test: String by project
-val androidx_espresso: String by project
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties").inputStream()
+    load(file)
+}
+
+val YOUTUBE_API_KEY: String by localProperties
+val MAPBOX_ACCESS_TOKEN: String by localProperties
 
 plugins {
     id("com.android.application")
@@ -32,9 +37,11 @@ android {
         minSdkVersion(16)
         targetSdkVersion(28)
         multiDexEnabled = true
-        versionCode = 10
-        versionName = "1.0.9"
+        versionCode = 11
+        versionName = "2.0.0"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "YOUTUBE_API_KEY", YOUTUBE_API_KEY)
     }
     buildTypes {
         val release by getting {
@@ -49,15 +56,16 @@ android {
         exclude("META-INF/*.kotlin_module")
     }
     kotlinOptions {
-        val options = this as KotlinJvmOptions
-        options.jvmTarget = "1.8"
+        jvmTarget = "1.8"
     }
 }
 
 dependencies {
+    implementation(files("libs/YouTubeAndroidPlayerApi.jar"))
+
     implementation(project(":common"))
 
-    implementation("androidx.appcompat:appcompat:$$androidx_base")
+    implementation("androidx.appcompat:appcompat:$androidx_base")
     implementation("androidx.core:core-ktx:$androidx_base")
     implementation("androidx.vectordrawable:vectordrawable:$androidx_base")
 
@@ -74,6 +82,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
     implementation("io.ktor:ktor-client-android:$ktor_version")
+
+    implementation("com.github.bumptech.glide:glide:$glide_version")
 
     implementation("com.mapbox.mapboxsdk:mapbox-android-sdk:$android_mapbox")
 

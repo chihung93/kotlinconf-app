@@ -10,7 +10,8 @@ import kotlinx.serialization.internal.*
 class ConferenceData(
     val allData: SessionizeData = SessionizeData(),
     val favorites: List<String> = emptyList(),
-    val votes: List<VoteData> = emptyList()
+    val votes: List<VoteData> = emptyList(),
+    val liveVideos: List<LiveVideo> = emptyList()
 )
 
 @Serializable
@@ -30,24 +31,28 @@ data class SessionData(
     val isPlenumSession: Boolean,
     val speakers: List<String>,
     @SerialName("description")
-    val descriptionText: String,
+    var descriptionText: String? = "",
     val startsAt: GMTDate,
     val endsAt: GMTDate,
     val title: String,
     val roomId: Int?,
     val questionAnswers: List<QuestionAnswerData> = emptyList(),
     val categoryItems: List<Int> = emptyList()
-)
+) {
+    init {
+        if (descriptionText == null) descriptionText = ""
+    }
+}
 
 @Serializable
-data class RoomData(
+class RoomData(
     val name: String,
     val id: Int,
     val sort: Int
 )
 
 @Serializable
-data class SpeakerData(
+class SpeakerData(
     val id: String,
     val firstName: String,
     val lastName: String,
@@ -63,7 +68,7 @@ data class SpeakerData(
 )
 
 @Serializable
-data class QuestionData(
+class QuestionData(
     val question: String,
     val id: Int,
     val sort: Int,
@@ -71,7 +76,7 @@ data class QuestionData(
 )
 
 @Serializable
-data class CategoryData(
+class CategoryData(
     val id: Int,
     val sort: Int,
     val title: String,
@@ -85,31 +90,34 @@ class VoteData(
 )
 
 @Serializable
-data class QuestionAnswerData(
+class QuestionAnswerData(
     val questionId: Int,
     val answerValue: String
 )
 
 @Serializable
-data class LinkData(
+class LinkData(
     val linkType: String,
     val title: String,
     val url: String
 )
 
 @Serializable
-data class CategoryItemData(
+class CategoryItemData(
     val name: String,
     val id: Int,
     val sort: Int
 )
 
 @Serializable
-data class PartnerData(
+class PartnerData(
     val name: String,
     val logo: String,
     val description: String
 )
+
+@Serializable
+class LiveVideo(val room: Int, val videoId: String)
 
 /**
  * TODO: remove when serialization supports typeOf<EnumClass>()

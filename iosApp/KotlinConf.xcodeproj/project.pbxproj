@@ -26,6 +26,7 @@
 		2C7CD27A22B8F455000B3BD0 /* KotlinConfAPI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7CD27922B8F455000B3BD0 /* KotlinConfAPI.framework */; };
 		2C7CD27B22B8F455000B3BD0 /* KotlinConfAPI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7CD27922B8F455000B3BD0 /* KotlinConfAPI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C80C1B023191AF200D2CBA6 /* ScheduleTableSmallHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C80C1AF23191AF200D2CBA6 /* ScheduleTableSmallHeader.swift */; };
+		2C849F8A233A424F00E9BD5A /* WelcomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C849F89233A424F00E9BD5A /* WelcomeController.swift */; };
 		2CF0141B22958ACB00C235D1 /* SpeakerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0141A22958ACB00C235D1 /* SpeakerController.swift */; };
 		2CFA8EC422DCB398008B32E2 /* LiveVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CFA8EC322DCB398008B32E2 /* LiveVideo.swift */; };
 		2CFA8EC822DCB5DF008B32E2 /* HomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CFA8EC722DCB5DF008B32E2 /* HomeController.swift */; };
@@ -73,6 +74,7 @@
 		2C7CD27322B7B497000B3BD0 /* BaseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseView.swift; sourceTree = "<group>"; };
 		2C7CD27922B8F455000B3BD0 /* KotlinConfAPI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KotlinConfAPI.framework; path = "../common/build/fat-framework/KotlinConfAPI.framework"; sourceTree = "<group>"; };
 		2C80C1AF23191AF200D2CBA6 /* ScheduleTableSmallHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableSmallHeader.swift; sourceTree = "<group>"; };
+		2C849F89233A424F00E9BD5A /* WelcomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeController.swift; sourceTree = "<group>"; };
 		2CF0141A22958ACB00C235D1 /* SpeakerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerController.swift; sourceTree = "<group>"; };
 		2CFA8EC322DCB398008B32E2 /* LiveVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveVideo.swift; sourceTree = "<group>"; };
 		2CFA8EC722DCB5DF008B32E2 /* HomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeController.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				2CFA8EC722DCB5DF008B32E2 /* HomeController.swift */,
 				2CFA8ECB22DF0512008B32E2 /* SpeakersController.swift */,
 				2CFA8ECD22DF0AD8008B32E2 /* PartnersController.swift */,
+				2C849F89233A424F00E9BD5A /* WelcomeController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -355,6 +358,7 @@
 				2CFA8ECC22DF0512008B32E2 /* SpeakersController.swift in Sources */,
 				2C674AF222FD5258001CA3F5 /* SessionCardView.swift in Sources */,
 				2C7496F7230BE20E001F8562 /* PopupUtils.swift in Sources */,
+				2C849F8A233A424F00E9BD5A /* WelcomeController.swift in Sources */,
 				2C195303228C32EE00BA0BB9 /* ScheduleController.swift in Sources */,
 				2C416BA0229591C300BBA441 /* VenueController.swift in Sources */,
 				2CFA8ECE22DF0AD8008B32E2 /* PartnersController.swift in Sources */,

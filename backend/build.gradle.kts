@@ -75,6 +75,6 @@ tasks.withType<ShadowJar> {
     from(jvmJar.archiveFile)
 
     archiveBaseName.value("backend")
-    archiveClassifier.value(null)
-    archiveVersion.value(null)
+    classifier = null
+    version = null
 }

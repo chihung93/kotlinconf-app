@@ -25,6 +25,7 @@ class SessionCard(
     val date: String,
     val time: String,
     val location: RoomData,
+    val roomVideo: String?,
     val speakers: List<SpeakerData>,
     val isFavorite: CFlow<Boolean>,
     val ratingData: CFlow<RatingData?>,

@@ -24,6 +24,7 @@ internal fun Routing.api(database: Database, production: Boolean, sessionizeUrl:
     apiVote(database, production)
     apiFavorite(database, production)
     apiSynchronize(sessionizeUrl)
+    apiTwitter()
 }
 
 /*
@@ -171,8 +172,8 @@ private fun Routing.apiAll(database: Database) {
         val responseData = if (principal != null) {
             val votes = database.getVotes(principal.token)
             val favorites = database.getFavorites(principal.token)
-            ConferenceData(data, favorites, votes)
-        } else ConferenceData(data)
+            ConferenceData(data, favorites, votes, LIVE_INFO)
+        } else ConferenceData(data, liveVideos = LIVE_INFO)
 
         call.respond(responseData)
     }
@@ -200,6 +201,12 @@ private fun Routing.apiSynchronize(sessionizeUrl: String) {
     get("sessionizeSync") {
         synchronizeWithSessionize(sessionizeUrl)
         call.respond(HttpStatusCode.OK)
+    }
+}
+
+private fun Routing.apiTwitter() {
+    get("feed") {
+        call.respond(getFeedData())
     }
 }
 

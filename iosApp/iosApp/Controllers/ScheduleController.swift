@@ -16,7 +16,8 @@ class ScheduleController : UIViewController, UITableViewDelegate, UITableViewDat
 
     var activePopup: UIView? = nil
 
-    let tableHeader = UINib(nibName: "ScheduleHeader", bundle: nil).instantiate(withOwner: nil, options: [:])[0] as! ScheduleHeader
+    let tableHeader = UINib(nibName: "ScheduleHeader", bundle: nil)
+        .instantiate(withOwner: nil, options: [:])[0] as! ScheduleHeader
 
     lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -48,12 +49,19 @@ class ScheduleController : UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
 
         scheduleTable.addSubview(refreshControl)
-        scheduleTable.register(UINib(nibName: "ScheduleTableHeader", bundle: nil), forHeaderFooterViewReuseIdentifier: "ScheduleTableHeader")
-        scheduleTable.register(UINib(nibName: "ScheduleTableSmallHeader", bundle: nil), forHeaderFooterViewReuseIdentifier: "ScheduleTableSmallHeader")
+        scheduleTable.register(
+            UINib(nibName: "ScheduleTableHeader", bundle: nil),
+            forHeaderFooterViewReuseIdentifier: "ScheduleTableHeader"
+        )
 
-        Conference.errors.watch(block: {error in
+        scheduleTable.register(
+            UINib(nibName: "ScheduleTableSmallHeader", bundle: nil),
+            forHeaderFooterViewReuseIdentifier: "ScheduleTableSmallHeader"
+        )
+
+        Conference.errors.watch { error in
             self.refreshControl.endRefreshing()
-        })
+        }
 
         configureTableHeader()
 
@@ -61,17 +69,17 @@ class ScheduleController : UIViewController, UITableViewDelegate, UITableViewDat
         scheduleTable.dataSource = self
         searchBar.delegate = self
 
-        Conference.schedule.watch(block: {data in
+        Conference.schedule.watch { data in
             self.onSchedule(sessions: data as! [SessionGroup])
-        })
+        }
 
-        Conference.favoriteSchedule.watch(block: {data in
+        Conference.favoriteSchedule.watch { data in
             self.onFavorites(sessions: data as! [SessionGroup])
-        })
+        }
 
-        Conference.sessions.watch(block: {data in
+        Conference.sessions.watch { data in
             self.onSessions(sessions: data as! [SessionCard])
-        })
+        }
 
         self.view.isUserInteractionEnabled = true
     }
@@ -163,18 +171,27 @@ class ScheduleController : UIViewController, UITableViewDelegate, UITableViewDat
         let card = currentTable[section]
 
         if (card.daySection) {
-            let breakHeader = tableView.dequeueReusableHeaderFooterView(withIdentifier: "ScheduleTableSmallHeader") as! ScheduleTableSmallHeader
+            let breakHeader = tableView.dequeueReusableHeaderFooterView(
+                withIdentifier: "ScheduleTableSmallHeader"
+            ) as! ScheduleTableSmallHeader
+
             breakHeader.displayDay(title: card.title)
             return breakHeader
         }
 
         if (card.lunchSection) {
-            let breakHeader = tableView.dequeueReusableHeaderFooterView(withIdentifier: "ScheduleTableSmallHeader") as! ScheduleTableSmallHeader
+            let breakHeader = tableView.dequeueReusableHeaderFooterView(
+                withIdentifier: "ScheduleTableSmallHeader"
+            ) as! ScheduleTableSmallHeader
+
             breakHeader.displayLunch(title: card.title)
             return breakHeader
         }
 
-        let timeHeader = tableView.dequeueReusableHeaderFooterView(withIdentifier: "ScheduleTableHeader") as! ScheduleTableHeader
+        let timeHeader = tableView.dequeueReusableHeaderFooterView(
+            withIdentifier: "ScheduleTableHeader"
+        ) as! ScheduleTableHeader
+
         timeHeader.configureLook(month: card.month, day: Int(card.day), time: card.title)
         return timeHeader
     }
@@ -183,7 +200,10 @@ class ScheduleController : UIViewController, UITableViewDelegate, UITableViewDat
         let section = indexPath.section
         let row = indexPath.row
 
-        let result = tableView.dequeueReusableCell(withIdentifier: "ScheduleTableCell", for: indexPath) as! ScheduleTableCell
+        let result = tableView.dequeueReusableCell(
+            withIdentifier: "ScheduleTableCell", for: indexPath
+        ) as! ScheduleTableCell
+
         let card = searchActive ? searchResult[row] : currentTable[section].sessions[row]
         configureCell(cell: result, card: card)
 
@@ -201,11 +221,11 @@ class ScheduleController : UIViewController, UITableViewDelegate, UITableViewDat
             return
         }
 
-        searchResult = sessions.filter({card in
+        searchResult = sessions.filter { card in
             let title = card.session.title.lowercased()
             let speakers = card.speakers.map { $0.fullName.lowercased() }.joined()
             return title.contains(query!) || speakers.contains(query!)
-        })
+        }
 
         scheduleTable.reloadData()
     }
@@ -231,7 +251,9 @@ class ScheduleController : UIViewController, UITableViewDelegate, UITableViewDat
 
     private func showSession(card: SessionCard) {
         let sessionBoard = UIStoryboard(name: "Main", bundle: nil)
-        let sessionView = sessionBoard.instantiateViewController(withIdentifier: "Session") as! SessionController
+        let sessionView = sessionBoard.instantiateViewController(
+            withIdentifier: "Session"
+        ) as! SessionController
 
         sessionView.card = card
         self.navigationController?.pushViewController(sessionView, animated: true)
@@ -284,6 +306,7 @@ class ScheduleController : UIViewController, UITableViewDelegate, UITableViewDat
         if (searchActive) {
             return
         }
+
         let currentOffset = scrollView.contentOffset.y
         if (currentOffset > startOffset + bounceGap && !headerView.isHidden) {
             UIView.transition(

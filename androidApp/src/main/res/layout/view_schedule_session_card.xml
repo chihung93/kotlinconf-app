@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/dark_grey_5">
+    android:background="#0027282C">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/speaker_card"
+        android:id="@+id/session_card"
         android:layout_width="0dp"
         android:layout_height="114dp"
         android:layout_marginStart="8dp"
@@ -16,13 +16,14 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="6dp"
         android:background="@color/white"
+        android:elevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/card_session_name"
+            android:id="@+id/tweet_name"
             style="@style/H4Roboto"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -47,7 +48,7 @@
             android:text="Amal Kakaiya"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/card_session_name" />
+            app:layout_constraintTop_toBottomOf="@id/tweet_name" />
 
         <ImageView
             android:id="@+id/card_location_arrow"
@@ -122,10 +123,11 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/card_vote_popup"
             android:layout_width="154dp"
-            android:layout_height="48dp"
+            android:layout_height="58dp"
             android:layout_marginEnd="49dp"
             android:layout_marginRight="49dp"
-            android:background="@color/white"
+            android:background="@drawable/popup_background"
+            android:elevation="6dp"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">

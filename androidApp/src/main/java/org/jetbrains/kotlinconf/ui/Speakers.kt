@@ -1,17 +1,15 @@
 package org.jetbrains.kotlinconf.ui
 
-import android.graphics.BitmapFactory
-import android.graphics.Rect
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import android.graphics.*
+import android.os.*
+import android.view.*
+import androidx.fragment.app.*
+import androidx.recyclerview.widget.*
+import com.bumptech.glide.*
+import kotlinx.android.synthetic.main.fragment_speakers.view.*
+import kotlinx.android.synthetic.main.view_speakers_list_item.view.*
 import org.jetbrains.kotlinconf.*
+import org.jetbrains.kotlinconf.R
 
 class SpeakersController : Fragment() {
     private val speakers by lazy { SpeakersAdapter() }
@@ -34,7 +32,7 @@ class SpeakersController : Fragment() {
     }
 
     private fun View.setupSpeakers() {
-        findViewById<RecyclerView>(R.id.speakers_list).apply {
+        speakers_list.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = speakers
 
@@ -42,12 +40,12 @@ class SpeakersController : Fragment() {
         }
     }
 
-    inner class SpeakersAdapter(
+    private inner class SpeakersAdapter(
         var speakers: List<SpeakerData> = emptyList()
     ) : RecyclerView.Adapter<SpeakerViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SpeakerViewHolder {
-            val holder = layoutInflater.inflate(R.layout.speaker_card_view, parent, false)
+            val holder = layoutInflater.inflate(R.layout.view_speakers_list_item, parent, false)
             return SpeakerViewHolder(holder)
         }
 
@@ -60,37 +58,32 @@ class SpeakersController : Fragment() {
     }
 }
 
-class SpeakerViewHolder(private val speakerView: View) : RecyclerView.ViewHolder(speakerView) {
+private class SpeakerViewHolder(private val speakerView: View) : RecyclerView.ViewHolder(speakerView) {
     fun update(speaker: SpeakerData) {
         val picture = speaker.profilePicture
 
         speakerView.apply {
             setOnClickListener {
                 setBackgroundColor(color(R.color.selected_white))
-                speakerView.showActivity<SpeakerActivity>()
+                speakerView.showActivity<SpeakerActivity> {
+                    putExtra("speaker", speaker.id)
+                }
                 setBackgroundColor(color(R.color.white))
             }
 
-            val photo = findViewById<ImageView>(R.id.speaker_photo)
-            val name = findViewById<TextView>(R.id.speaker_name)
-            val description = findViewById<TextView>(R.id.speaker_description)
+            speaker_name.text = speaker.fullName.toUpperCase()
+            speaker_description.text = speaker.tagLine
 
-            name.text = speaker.fullName.toUpperCase()
-            description.text = speaker.tagLine
-
-            if (picture == null) {
-                photo.setImageBitmap(null)
-                return
-            }
-
-            ConferenceService.findPicture(picture) {
-                photo.setImageBitmap(BitmapFactory.decodeByteArray(it, 0, it.size))
-            }
+            Glide.with(this)
+                .load(picture)
+                .into(speaker_photo)
         }
     }
 }
 
-class SpeakerViewDecoration(private val spacing: Int = 8) : RecyclerView.ItemDecoration() {
+private class SpeakerViewDecoration(
+    private val spacing: Int = 8
+) : RecyclerView.ItemDecoration() {
     override fun getItemOffsets(
         outRect: Rect,
         view: View,

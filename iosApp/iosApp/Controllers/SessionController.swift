@@ -50,7 +50,7 @@ class SessionController : UIViewController, UIScrollViewDelegate {
         // Description
 
         descriptionLabel.text = session.descriptionText
-        descriptionLabel.attributedText = TextWithLineHeight(text: session.descriptionText, height: 24)
+        descriptionLabel.attributedText = TextWithLineHeight(text: session.descriptionText!, height: 24)
 
         // Speakers
         let firstSpeaker = card.speakers[0]
@@ -66,25 +66,25 @@ class SessionController : UIViewController, UIScrollViewDelegate {
         // Time
         timeLabel.text = card.time + " " + card.date
 
-        liveObserver = card.isLive.watch(block: { isLive in
+        liveObserver = card.isLive.watch { isLive in
             self.liveChange(isLive!.boolValue)
-        })
+        }
 
         // Location
         locationLabel.setTitle(" " + card.location.name, for: .normal)
 
         // Favorite
-        favoriteObserver = card.isFavorite.watch(block: { isFavorite in
+        favoriteObserver = card.isFavorite.watch { isFavorite in
             self.favoriteChange(isFavorite!.boolValue)
-        })
+        }
 
         // Rating
-        ratingObserver = card.ratingData.watch(block: { rating in
+        ratingObserver = card.ratingData.watch { rating in
             self.ratingChange(rating)
-        })
+        }
 
         // button borders
-        borders = [speaker1, speaker2, locationLabel].map({ button in
+        borders = [speaker1, speaker2, locationLabel].map { button in
             let label = button!.titleLabel
             label?.sizeToFit()
             let xOffset: CGFloat = (button?.imageView?.image != nil) ? 21.0 : 12.0
@@ -92,16 +92,17 @@ class SessionController : UIViewController, UIScrollViewDelegate {
             var size = label!.bounds.size
             size.width += (button?.imageView?.image != nil) ? xOffset + 12.0 : xOffset * 2.0
             return label!.layer.addBorders(size, xOffset, 8)
-        })
+        }
+
         speakers.sizeToFit()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        borders.forEach({ layer in
+        borders.forEach { layer in
             layer.removeFromSuperlayer()
-        })
+        }
         releaseObservers()
     }
 
@@ -153,10 +154,13 @@ class SessionController : UIViewController, UIScrollViewDelegate {
     }
 
     private func liveChange(_ isLive: Bool) {
-        if (isLive) {
-            video.load(withVideoId: "YbF8Q8LxAJs")
+        let videoId = card.roomVideo
+        if (isLive && videoId != nil) {
+            video.load(withVideoId: videoId!)
+            video.isHidden = !isLive
+        } else {
+            video.isHidden = true
         }
-        video.isHidden = !isLive
     }
 
     private func ratingChange(_ rating: RatingData?) {

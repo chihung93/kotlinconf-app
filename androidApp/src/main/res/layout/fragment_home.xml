@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/dark_grey">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:background="@color/dark_grey">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,22 +29,16 @@
                 android:textSize="80sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"/>
 
-            <HorizontalScrollView
-                android:id="@+id/live_cards"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/live_cards_container"
                 android:layout_width="match_parent"
                 android:layout_height="278dp"
                 android:layout_marginTop="25dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/live_title">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"></LinearLayout>
-            </HorizontalScrollView>
+                app:layout_constraintTop_toBottomOf="@id/live_title"/>
 
             <TextView
                 android:id="@+id/dont_miss_title"
@@ -58,16 +52,14 @@
                 android:textColor="@color/white"
                 android:textSize="80sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/live_cards" />
+                app:layout_constraintTop_toBottomOf="@id/live_cards_container"/>
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/dont_miss_block"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@id/dont_miss_title">
-
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@id/dont_miss_title"/>
 
             <TextView
                 android:id="@+id/tweet_title"
@@ -81,22 +73,16 @@
                 android:textColor="@color/white"
                 android:textSize="80sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/dont_miss_block" />
+                app:layout_constraintTop_toBottomOf="@id/dont_miss_block"/>
 
-            <HorizontalScrollView
-                android:id="@+id/tweet_feed"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tweet_feed_list"
                 android:layout_width="match_parent"
                 android:layout_height="440dp"
                 android:layout_marginTop="25dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tweet_title">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"></LinearLayout>
-            </HorizontalScrollView>
+                app:layout_constraintTop_toBottomOf="@id/tweet_title"/>
 
             <TextView
                 android:id="@+id/partners_title"
@@ -110,13 +96,32 @@
                 android:textColor="@color/white"
                 android:textSize="80sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tweet_feed" />
+                app:layout_constraintTop_toBottomOf="@id/tweet_feed_list"/>
+
+            <TextView
+                android:id="@+id/partners_show"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="77dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginRight="24dp"
+                android:fontFamily="sans-serif"
+                android:gravity="end"
+                android:lineSpacingExtra="9sp"
+                android:textColor="@color/red_orange"
+                android:textSize="15sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tweet_feed_list"
+                tools:text="See All"/>
 
             <HorizontalScrollView
                 android:id="@+id/partners_view"
                 android:layout_width="match_parent"
                 android:layout_height="450dp"
                 android:layout_marginTop="25dp"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/partners_title">

@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import KotlinConfAPI
+import Nuke
 
 class SpeakerController : UIViewController {
     @IBOutlet weak var nameLabel: UILabel!
@@ -15,9 +16,7 @@ class SpeakerController : UIViewController {
         nameLabel.text = speaker.fullName.uppercased()
 
         if let profilePicture = speaker.profilePicture {
-            Conference.findPicture(url: profilePicture) { (bytes) in
-                self.photoView.image = UIImage(data: bytes.toNSData())
-            }
+            Nuke.loadImage(with: URL(string: profilePicture)!, into: photoView)
         }
 
         descriptionLabel.attributedText = TextWithLineHeight(text: speaker.bio, height: 24)

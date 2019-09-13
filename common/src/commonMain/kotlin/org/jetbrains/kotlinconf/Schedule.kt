@@ -44,7 +44,7 @@ internal fun List<SessionGroup>.addLunches(): List<SessionGroup> {
             continue
         }
 
-        result.add(group.makeLunchHeader(lunchString))
+        result += group.makeLunchHeader(lunchString)
         result.add(group)
     }
 

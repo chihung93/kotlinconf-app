@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/red_orange">
@@ -8,6 +9,27 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/session_video_box"
+            android:layout_width="match_parent"
+            android:layout_height="206dp"
+            android:layout_marginStart="23dp"
+            android:layout_marginLeft="23dp"
+            android:layout_marginTop="23dp"
+            android:layout_marginEnd="23dp"
+            android:layout_marginRight="23dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <fragment
+                android:id="@+id/session_video_view"
+                class="org.jetbrains.kotlinconf.ui.LiveVideoFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/session_title"
@@ -25,7 +47,8 @@
             android:textSize="60sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/session_video_box"
+            tools:visibility="visible" />
 
         <ImageButton
             android:id="@+id/session_share"
@@ -41,9 +64,9 @@
 
         <ImageButton
             android:id="@+id/session_vote"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_marginTop="35dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="32dp"
             android:layout_marginEnd="24dp"
             android:layout_marginRight="24dp"
             android:background="@color/red_orange"
@@ -51,6 +74,60 @@
             app:layout_constraintEnd_toStartOf="@id/session_favorite"
             app:layout_constraintTop_toBottomOf="@id/session_title"
             app:srcCompat="@drawable/good_white_empty" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/session_vote_popup"
+            android:layout_width="154dp"
+            android:layout_height="58dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="54dp"
+            android:layout_marginRight="54dp"
+            android:background="@drawable/popup_background"
+            android:elevation="6dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/session_title">
+
+
+            <ImageButton
+                android:id="@+id/session_vote_good"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="1dp"
+                android:background="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/good_empty" />
+
+            <ImageButton
+                android:id="@+id/session_vote_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="21dp"
+                android:layout_marginLeft="21dp"
+                android:layout_marginBottom="1dp"
+                android:background="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/session_vote_good"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ok_empty" />
+
+            <ImageButton
+                android:id="@+id/session_vote_bad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="21dp"
+                android:layout_marginLeft="21dp"
+                android:layout_marginBottom="1dp"
+                android:background="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/session_vote_ok"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/bad_empty" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageButton
             android:id="@+id/session_favorite"
@@ -69,7 +146,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="34dp"
-            android:background="@color/white"
+            android:background="@color/white44"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/session_favorite" />
@@ -103,7 +180,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="17dp"
-            android:background="@color/white"
+            android:background="@color/white44"
             app:layout_constraintBottom_toTopOf="@+id/session_location_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -139,7 +216,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="17dp"
-            android:background="@color/white"
+            android:background="@color/white44"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/session_location" />
@@ -176,7 +253,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="18dp"
-            android:background="@color/white"
+            android:background="@color/white44"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/session_time_icon" />

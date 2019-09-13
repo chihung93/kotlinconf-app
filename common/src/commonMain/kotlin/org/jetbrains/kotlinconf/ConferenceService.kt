@@ -1,15 +1,14 @@
 package org.jetbrains.kotlinconf
 
+import io.ktor.util.date.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.*
-import kotlinx.serialization.internal.*
 import org.jetbrains.kotlinconf.presentation.*
 import org.jetbrains.kotlinconf.storage.*
+import kotlin.collections.set
 import kotlin.coroutines.*
 import kotlin.native.concurrent.*
-import kotlin.random.*
 
 /**
  * [ConferenceService] handles data and builds model.
@@ -31,13 +30,15 @@ object ConferenceService : CoroutineScope {
     override val coroutineContext: CoroutineContext = dispatcher() + SupervisorJob() + exceptionHandler
 
     private val storage: ApplicationStorage = ApplicationStorage()
-    private var userId: String? by storage(NullableSerializer(String.serializer())) { null }
+    private var userId: String? = null
+    private var titleScreenShown: Boolean = false
 
     /**
      * Cached.
      */
     private var cards: MutableMap<String, SessionCard> = mutableMapOf()
 
+    private val notificationManager = NotificationManager()
     /**
      * ------------------------------
      * Observables.
@@ -56,12 +57,17 @@ object ConferenceService : CoroutineScope {
     private val _favorites by storage.live { mutableSetOf<String>() }
     val favorites = _favorites.asFlow().wrap()
 
+    private val _votes by storage.live { mutableMapOf<String, RatingData>() }
+    private val _feed = ConflatedBroadcastChannel<FeedData>(FeedData())
+
     /**
      * Votes list.
      */
-    private val _votes by storage.live { mutableMapOf<String, RatingData>() }
     val votes = _votes.asFlow().wrap()
 
+    val feed = _feed.asFlow().wrap()
+
+    private var _videos: List<LiveVideo> = emptyList()
     /**
      * Live sessions.
      */
@@ -95,9 +101,6 @@ object ConferenceService : CoroutineScope {
     }.wrap()
 
     init {
-        acceptPrivacyPolicy()
-
-
         launch {
             userId?.let { Api.sign(it) }
 
@@ -108,9 +111,8 @@ object ConferenceService : CoroutineScope {
 
         launch {
             while (true) {
-                updateLive()
-                updateUpcoming()
-                delay(5 * 1000)
+                scheduledUpdate()
+                delay(60 * 1000)
             }
         }
     }
@@ -184,6 +186,7 @@ object ConferenceService : CoroutineScope {
             session.startsAt.dayAndMonth(),
             "${session.startsAt.time()}-${session.endsAt.time()}",
             location,
+            _videos.find { it.room == location.id }?.videoId,
             speakers,
             isFavorite,
             ratingData,
@@ -194,25 +197,38 @@ object ConferenceService : CoroutineScope {
         return result
     }
 
-    fun findPicture(url: String, block: (ByteArray) -> Unit) {
-        launch {
-            val result = Api.loadPicture(url)
-            block(result)
-        }
-    }
-
     /**
      * ------------------------------
      * User actions.
      * ------------------------------
      */
+    /**
+     * Accept privacy policy clicked.
+     */
+    fun acceptPrivacyPolicy() {
+        if (userId != null) return
+
+        val id = generateUserId().also {
+            userId = it
+        }
+
+        launch {
+            Api.sign(id)
+        }
+    }
+
+    fun requestNotificationPermissions() {
+        launch {
+            notificationManager.requestPermission()
+        }
+    }
 
     /**
      * Vote for session.
      */
     fun vote(sessionId: String, rating: RatingData) {
         launch {
-            val userId = userId ?: error("Privacy policy isn't accepted.")
+            val userId = userId ?: throw Unauthorized()
 
             val votes = _votes.value
             val oldRating = votes[sessionId]
@@ -240,37 +256,24 @@ object ConferenceService : CoroutineScope {
      */
     fun markFavorite(sessionId: String) {
         launch {
-            val userId = userId ?: error("Privacy policy isn't accepted.")
+            val userId = userId ?: throw Unauthorized()
 
-            val isFavorite = sessionId in _favorites.value
+            val isFavorite = !(sessionId in _favorites.value)
 
             try {
-                updateFavorite(sessionId, !isFavorite)
+                updateFavorite(sessionId, isFavorite)
                 if (isFavorite) {
                     Api.postFavorite(userId, sessionId)
+                    notificationManager.schedule("", "", GMTDate() + 5000)
                 } else {
                     Api.deleteFavorite(userId, sessionId)
                 }
             } catch (cause: Throwable) {
-                updateFavorite(sessionId, isFavorite)
+                updateFavorite(sessionId, !isFavorite)
             }
         }
     }
 
-    /**
-     * Accept privacy policy clicked.
-     */
-    fun acceptPrivacyPolicy() {
-        if (userId != null) return
-
-        val id = generateUserId().also {
-            userId = it
-        }
-
-        launch {
-            Api.sign(id)
-        }
-    }
 
     /**
      * Reload data model from server.
@@ -278,18 +281,31 @@ object ConferenceService : CoroutineScope {
     fun refresh() {
         launch {
             Api.getAll(userId).apply {
+                _videos = liveVideos
                 _publicData.offer(allData)
                 _favorites.offer(favorites.toMutableSet())
                 val votesMap = mutableMapOf<String, RatingData>().apply {
                     putAll(votes.mapNotNull { vote -> vote.rating?.let { vote.sessionId to it } })
                 }
                 _votes.offer(votesMap)
+
+                scheduledUpdate()
             }
         }
     }
 
+    private suspend fun scheduledUpdate() {
+        if (_publicData.value.sessions.isEmpty()) {
+            refresh()
+        }
+
+        updateLive()
+        updateUpcoming()
+        updateFeed()
+    }
+
     /**
-     * TODO: mock for now
+     * TODO: introduce timezone.
      */
     private fun updateLive() {
         val sessions = _publicData.value.sessions
@@ -298,19 +314,24 @@ object ConferenceService : CoroutineScope {
             return
         }
 
-        val result = mutableSetOf<String>()
-        repeat(5) {
-            val index = Random.nextInt(sessions.size)
-            result += sessions[index].id
-            return
-        }
+        val timeInfo = GMTDate()
+        val timezoneOffset = 2 * 60 * 60 * 1000L
+
+        val now = GMTDate(
+            timeInfo.seconds, timeInfo.minutes, timeInfo.hours,
+            dayOfMonth = 5,
+            month = Month.DECEMBER,
+            year = 2019
+        ) + timezoneOffset
+
+        val result = sessions
+            .filter { it.startsAt <= now && now <= it.endsAt }
+            .map { it.id }
+            .toSet()
 
         _liveSessions.offer(result)
     }
 
-    /**
-     * TODO: mock for now
-     */
     private fun updateUpcoming() {
         val favorites = _favorites.value.toList()
         if (favorites.isEmpty()) {
@@ -318,13 +339,20 @@ object ConferenceService : CoroutineScope {
             return
         }
 
-        val result = mutableSetOf<String>()
-        repeat(5) {
-            val index = Random.nextInt(favorites.size)
-            result += favorites[index]
-        }
+        val today = GMTDate(
+            0, 0, 0,
+            dayOfMonth = 3,
+            month = Month.DECEMBER,
+            year = 2019
+        ).dayOfYear
 
-        _upcomingFavorites.offer(result)
+        val cards = favorites
+            .map { sessionCard(it) }
+            .filter { it.session.startsAt.dayOfYear == today }
+            .map { it.session.id }
+            .toSet()
+
+        _upcomingFavorites.offer(cards)
     }
 
     private fun updateVote(sessionId: String, rating: RatingData?) {
@@ -348,8 +376,30 @@ object ConferenceService : CoroutineScope {
             favorites.remove(sessionId)
         } else {
             favorites.add(sessionId)
+
+            val session = session(sessionId)
+            val startsAt = session.startsAt
+            val now = GMTDate()
+
+            val notificationTime = GMTDate(
+                startsAt.seconds, startsAt.minutes, startsAt.hours,
+                now.dayOfMonth, now.month, now.hours
+            )
+
+            launch {
+                notificationManager.schedule(
+                    session.title,
+                    session.startsAt.toString(),
+                    notificationTime
+                )
+            }
+
         }
 
         _favorites.offer(favorites)
+    }
+
+    private suspend fun updateFeed() {
+        _feed.offer(Api.getFeed())
     }
 }

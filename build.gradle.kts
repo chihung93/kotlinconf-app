@@ -20,6 +20,7 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven("https://dl.bintray.com/kotlin/kotlinx")
         maven("https://dl.bintray.com/kotlin/ktor")

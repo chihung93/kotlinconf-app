@@ -1,29 +1,23 @@
 package org.jetbrains.kotlinconf.ui
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.view.isVisible
+import android.app.*
+import android.os.*
+import android.view.*
+import android.view.inputmethod.*
+import androidx.core.widget.*
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.tabs.TabLayout
-import io.ktor.utils.io.core.Closeable
-import org.jetbrains.kotlinconf.ConferenceService
-import org.jetbrains.kotlinconf.R
-import org.jetbrains.kotlinconf.color
-import org.jetbrains.kotlinconf.presentation.SessionCard
-import org.jetbrains.kotlinconf.presentation.SessionGroup
-import org.jetbrains.kotlinconf.showActivity
+import androidx.recyclerview.widget.*
+import com.google.android.material.tabs.*
+import kotlinx.android.synthetic.main.fragment_schedule.view.*
+import org.jetbrains.kotlinconf.*
+import org.jetbrains.kotlinconf.presentation.*
+import org.jetbrains.kotlinconf.ui.details.*
 
 class ScheduleController : Fragment() {
     private val schedule by lazy { ScheduleAdapter() }
     private val favorites by lazy { ScheduleAdapter() }
-    private val search by lazy { ScheduleAdapter() }
+    private val search by lazy { SearchAdapter() }
+    private var lastAdapter: RecyclerView.Adapter<*>? = null
 
     private lateinit var listView: RecyclerView
 
@@ -34,6 +28,16 @@ class ScheduleController : Fragment() {
             schedule.data = it
             schedule.notifyDataSetChanged()
         }
+
+        ConferenceService.favoriteSchedule.watch {
+            favorites.data = it
+            favorites.notifyDataSetChanged()
+        }
+
+        ConferenceService.sessions.watch {
+            search.data = it
+            search.notifyDataSetChanged()
+        }
     }
 
     override fun onCreateView(
@@ -43,30 +47,66 @@ class ScheduleController : Fragment() {
     ): View? = inflater.inflate(R.layout.fragment_schedule, container, false).apply {
         setupSchedule()
         setupTabs()
+        setupSearch()
     }
 
     private fun View.setupTabs() {
-        findViewById<TabLayout>(R.id.schedule_tabs).addOnTabSelectedListener(object :
+        schedule_tabs.addOnTabSelectedListener(object :
             TabLayout.BaseOnTabSelectedListener<TabLayout.Tab> {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                when (tab.position) {
-                    0 -> listView.adapter = schedule
-                    else -> listView.adapter = favorites
-                }
+                displayTab(tab.position)
             }
 
             override fun onTabReselected(p0: TabLayout.Tab?) {}
-
             override fun onTabUnselected(p0: TabLayout.Tab?) {}
         })
+    }
 
-        findViewById<ImageButton>(R.id.search_button).setOnClickListener {
-            listView.adapter = search
+    private fun View.setupSearch() {
+        search_button.setOnClickListener {
+            startSearch()
+        }
+        search_cancel_button.setOnClickListener {
+            val inputManager = context
+                .getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+
+            inputManager.hideSoftInputFromWindow(this@setupSearch.windowToken, 0)
+            stopSearch()
+        }
+
+        search_box.apply {
+            addTextChangedListener {
+                search.query = it!!.toString()
+                search.notifyDataSetChanged()
+            }
+        }
+    }
+
+    private fun View.startSearch() {
+        search_bar.visibility = View.VISIBLE
+        tab_bar.visibility = View.GONE
+        lastAdapter = listView.adapter
+        listView.adapter = search
+    }
+
+    private fun View.stopSearch() {
+        search_bar.visibility = View.GONE
+        tab_bar.visibility = View.VISIBLE
+        search_box.setText("")
+        search.query = ""
+        search.notifyDataSetChanged()
+        listView.adapter = lastAdapter ?: schedule
+    }
+
+    private fun displayTab(id: Int) {
+        when (id) {
+            0 -> listView.adapter = schedule
+            else -> listView.adapter = favorites
         }
     }
 
     private fun View.setupSchedule() {
-        listView = findViewById<RecyclerView>(R.id.schedule_list).apply {
+        listView = schedule_list.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = schedule
 
@@ -74,76 +114,93 @@ class ScheduleController : Fragment() {
         }
     }
 
-    inner class ScheduleAdapter(var data: List<SessionGroup> = emptyList()) :
-        RecyclerView.Adapter<SessionCardHolder>() {
-        private val TYPE_DAY = 0
-        private val TYPE_TIME = 1
-        private val TYPE_CARD = 2
+    internal inner class ScheduleAdapter : RecyclerView.Adapter<SessionCardHolder>() {
+        private var schedule: List<ScheduleItem> = emptyList()
 
-        private val sessions get() = data.flatMap { it.sessions }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionCardHolder {
-            val holder = when (viewType) {
-                TYPE_DAY -> TODO()
-                TYPE_TIME -> TODO()
-                else -> layoutInflater.inflate(R.layout.schedule_card_view, parent, false)
+        var data: List<SessionGroup> = emptyList()
+            set(value) {
+                updateSchedule(value)
+                field = value
             }
 
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionCardHolder {
+            val view = when (viewType) {
+                ScheduleItem.TYPE_SMALL -> R.layout.view_schedule_header_small
+                ScheduleItem.TYPE_LARGE -> R.layout.view_schedule_header_large
+                else -> R.layout.view_schedule_session_card
+            }
+
+            val holder = layoutInflater.inflate(view, parent, false)
             return SessionCardHolder(holder)
         }
 
-        override fun getItemCount(): Int = sessions.size
+        override fun getItemCount(): Int = schedule.size
 
         override fun onBindViewHolder(holder: SessionCardHolder, position: Int) {
-            holder.showCard(sessions[position])
+            holder.show(schedule[position])
         }
 
         override fun getItemViewType(position: Int): Int {
-            return TYPE_CARD
+            return schedule[position].type
+        }
+
+        private fun updateSchedule(groups: List<SessionGroup>) {
+            val result = mutableListOf<ScheduleItem>()
+            for (group in groups) {
+                if (group.daySection) {
+                    result += ScheduleItem.SmallHeader(
+                        group.title, R.color.dark_grey_40
+                    )
+                    continue
+                }
+                if (group.lunchSection) {
+                    result += ScheduleItem.SmallHeader(
+                        group.title, R.color.red_orange
+                    )
+                    continue
+                }
+
+                result += ScheduleItem.LargeHeader(group)
+                result += group.sessions.map { ScheduleItem.Card(it) }
+            }
+
+            schedule = result
+        }
+    }
+
+    internal inner class SearchAdapter : RecyclerView.Adapter<SessionCardHolder>() {
+        var data: List<SessionCard> = emptyList()
+            set(value) {
+                field = value
+                updateSearchResults()
+            }
+
+        var query: String = ""
+            set(value) {
+                field = value.toLowerCase()
+                updateSearchResults()
+            }
+
+        private var searchResults: List<SessionCard> = emptyList()
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionCardHolder {
+            val holder = layoutInflater.inflate(R.layout.view_schedule_session_card, parent, false)
+            return SessionCardHolder(holder)
+        }
+
+        override fun getItemCount(): Int = searchResults.size
+
+        override fun onBindViewHolder(holder: SessionCardHolder, position: Int) {
+            holder.show(ScheduleItem.Card(searchResults[position]))
+        }
+
+        private fun updateSearchResults() {
+            searchResults = data.filter {
+                val speakers = it.speakers.joinToString { it.fullName.toLowerCase() }
+                query in it.session.title.toLowerCase() || query in speakers
+            }
         }
     }
 }
 
-class SessionCardHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-    var liveWatcher: Closeable? = null
-
-    fun showCard(card: SessionCard) {
-        view.apply {
-            liveWatcher?.close()
-
-            val session = findViewById<TextView>(R.id.card_session_name)
-            val speakers = findViewById<TextView>(R.id.card_session_speakers)
-            val location = findViewById<TextView>(R.id.card_location_label)
-            val liveIcon = findViewById<ImageView>(R.id.card_live_icon)
-            val liveLabel = findViewById<TextView>(R.id.card_live_label)
-            val voteButton = findViewById<ImageButton>(R.id.card_vote_button)
-            val votePopup = findViewById<View>(R.id.card_vote_popup)
-
-            session.text = card.session.title
-            speakers.text = card.speakers.joinToString { it.fullName }
-            location.text = card.location.name
-            liveLabel.text = "Live now"
-
-            liveWatcher = card.isLive.watch {
-                liveIcon.isVisible = it
-                liveLabel.isVisible = it
-            }
-
-            voteButton.setOnClickListener {
-                votePopup.visibility = View.VISIBLE
-            }
-
-            setOnClickListener {
-                setBackgroundColor(color(R.color.selected_white))
-                showActivity<SessionActivity>()
-                setBackgroundColor(color(R.color.white))
-            }
-
-        }
-    }
-
-    companion object {
-    }
-}
-
-class SessionCardDecoration : RecyclerView.ItemDecoration()
+internal class SessionCardDecoration : RecyclerView.ItemDecoration()

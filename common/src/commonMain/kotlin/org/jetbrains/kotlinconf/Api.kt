@@ -14,10 +14,10 @@ import kotlin.native.concurrent.ThreadLocal
  */
 @ThreadLocal
 internal object Api {
-    //    val endpoint = "https://konf-staging.kotlin-aws.intellij.net/"
+//        val endpoint = "https://konf-staging.kotlin-aws.intellij.net/"
 //    val endpoint = "http://172.30.160.213:8080"
-//    val endpoint = "http://10.0.2.2:8080"
-    val endpoint = "http://0.0.0.0:8080"
+    val endpoint = "http://10.0.2.2:8080"
+//    val endpoint = "http://0.0.0.0:8080"
 
     private val client = HttpClient {
         install(JsonFeature)
@@ -43,15 +43,12 @@ internal object Api {
     /**
      * @return status of request.
      */
-    suspend fun sign(userId: String): Boolean {
-
-        return client.request<HttpResponse> {
-            apiUrl("users")
-            method = HttpMethod.Post
-            body = userId
-        }.use {
-            it.status.isSuccess()
-        }
+    suspend fun sign(userId: String): Boolean = client.request<HttpResponse> {
+        apiUrl("users")
+        method = HttpMethod.Post
+        body = userId
+    }.use {
+        it.status.isSuccess()
     }
 
     /**
@@ -92,10 +89,13 @@ internal object Api {
      */
     suspend fun deleteVote(userId: String, sessionId: String): Unit = client.delete {
         apiUrl("votes", userId)
-        body = sessionId
+        json()
+        body = VoteData(sessionId)
     }
 
-    suspend fun loadPicture(url: String): ByteArray = client.get(url)
+    suspend fun getFeed(): FeedData = client.get {
+        apiUrl("feed")
+    }
 
     private fun HttpRequestBuilder.json() {
         contentType(ContentType.Application.Json)
