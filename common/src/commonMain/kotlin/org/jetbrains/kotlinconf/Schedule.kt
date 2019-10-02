@@ -9,6 +9,18 @@ internal fun List<SessionData>.groupByDay(): List<SessionGroup> = groupBy { it.s
         val endsAt = sessions.first().endsAt
         val time = "${startsAt.time()}-${endsAt.time()}"
 
+        val service = sessions.firstOrNull { it.isServiceSession && it.isPlenumSession }
+        if (service != null) {
+            return@map SessionGroup(
+                monthName,
+                day,
+                "${service.title.toUpperCase()} ",
+                startsAt,
+                emptyList(),
+                lunchSection = true
+            )
+        }
+
         val cards = sessions.map { ConferenceService.sessionCard(it.id) }
         SessionGroup(monthName, day, time, startsAt, cards)
     }.sortedBy { it.startsAt.timestamp }

@@ -1,13 +1,12 @@
 package org.jetbrains.kotlinconf.ui
 
-import android.content.res.*
 import android.os.*
 import androidx.appcompat.app.*
 import androidx.navigation.*
 import androidx.navigation.ui.*
 import com.mapbox.mapboxsdk.*
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.kotlinconf.*
+import org.jetbrains.kotlinconf.BuildConfig.*
 import org.jetbrains.kotlinconf.R
 
 class MainActivity : AppCompatActivity() {

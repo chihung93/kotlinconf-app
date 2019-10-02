@@ -85,7 +85,6 @@ object ConferenceService : CoroutineScope {
     val schedule = publicData.map {
         it.sessions.groupByDay()
             .addDayStart()
-            .addLunches()
     }.wrap()
 
     val favoriteSchedule = favorites.map {

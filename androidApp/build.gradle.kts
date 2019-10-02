@@ -42,6 +42,7 @@ android {
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "YOUTUBE_API_KEY", YOUTUBE_API_KEY)
+        buildConfigField("String", "MAPBOX_ACCESS_TOKEN", MAPBOX_ACCESS_TOKEN)
     }
     buildTypes {
         val release by getting {
